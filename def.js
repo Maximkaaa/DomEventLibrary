@@ -110,7 +110,7 @@
             var handlers = node._eventHandlers[event.type];
             if (handlers) {
                 for (var i = 0; i < handlers.length; i++) {
-                    var result = handlers[i](event);
+                    var result = handlers[i].handler(event);
                     if (result === false) {
                         event.preventDefault();
                         event.stopPropagation();
@@ -131,6 +131,14 @@
                 return 'MozMousePixelScroll';
             }
         }
+    }
+
+    if (typeof define === 'function' && define.amd) {
+        define(function() { return def; });
+    } else if (typeof module !== 'undefined') {
+        module.exports = def;
+    } else {
+        window.def = def;
     }
 
 })();
