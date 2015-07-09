@@ -47,8 +47,21 @@
                     return true;
                 }
             }
+        },
+
+        getMouseOffset: function(node, e) {
+            var docPos = getPosition(target);
+            return {x: e.pageX - docPos.x, y: e.pageY - docPos.y};
         }
     };
+
+    function getPosition(e) {
+        var clientRect = e.getBoundingClientRect(),
+            x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft,
+            y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        return {x: clientRect.left + x, y: clientRect.top + y};
+    }
+
 
     function removeHandlerType(node, type) {
         if (node.removeEventListener) {
@@ -94,9 +107,21 @@
             event.which = (event.button & 1 ? 1 : ( event.button & 2 ? 3 : ( event.button & 4 ? 2 : 0 ) ));
         }
 
+        if (event.type === 'wheel') event.wheelDirction = getWheelDirection(event);
+
         event.isFixed = true;
 
         return event;
+    }
+
+    function getWheelDirection(e) {
+        var wheelData = (e.detail ? e.detail *  -1 : e.wheelDelta / 40) || (e.deltaY * -1);
+        if (wheelData > 0) {
+            wheelData = 1;
+        } else if (wheelData < 0){
+            wheelData = -1;
+        }
+        return wheelData;
     }
 
     function getFixedType(type) {
