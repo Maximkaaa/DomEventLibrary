@@ -123,6 +123,7 @@
   window.expect = expect;
   window.describe = describe;
   window.beforeEach = beforeEach;
+  window.afterEach = afterEach;
   window.it = it;
 
 }());
