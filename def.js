@@ -67,8 +67,15 @@
         },
 
         getMouseOffset: function(node, e) {
-            var docPos = getPosition(target);
+            var docPos = this.getNodePosition(target);
             return {x: e.pageX - docPos.x, y: e.pageY - docPos.y};
+        },
+
+        getNodePosition: function(node) {
+            var clientRect = node.getBoundingClientRect(),
+                x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft,
+                y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+            return {x: clientRect.left + x, y: clientRect.top + y};
         }
     };
 
@@ -86,14 +93,6 @@
     function getEventNamespaces(string) {
         return string.match(/\.[A-Za-z0-9_-]+/g) || [];
     }
-
-    function getPosition(e) {
-        var clientRect = e.getBoundingClientRect(),
-            x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft,
-            y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-        return {x: clientRect.left + x, y: clientRect.top + y};
-    }
-
 
     function removeHandlerType(node, type) {
         if (node.removeEventListener) {
