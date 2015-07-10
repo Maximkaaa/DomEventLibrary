@@ -1,50 +1,67 @@
 (function() {
 
+    'use strict';
+
     var def = {
         /**
          * Sets a handler for the node
          * @param {HTMLElement} node
-         * @param {String} type
+         * @param {String} desc - description of the event: space separated event types and dot prefixed namespaces
          * @param {Function} handler
          */
-        on: function(node, type, handler) {
-            type = getFixedType(type);
+        on: function(node, desc, handler) {
+            var types = getEventTypes(desc);
+            var namespaces = getEventNamespaces(desc);
 
-            if (!node._eventHandlers) node._eventHandlers = {_handler: getCommonHandler(node)};
-            if (!node._eventHandlers[type]) {
-                node._eventHandlers[type] = [];
-                if (node.addEventListener) {
-                    node.addEventListener(type, node._eventHandlers._handler, false);
-                } else if (node.attachEvent) {
-                    node.attachEvent("on" + type, node._eventHandlers._handler);
-                } else {
-                    throw(new Error('Unknown type of the node: ' + node));
+            for (var i = 0; i < types.length; i++) {
+                var type = getFixedType(types[i]);
+
+                if (!node._eventHandlers) node._eventHandlers = {_handler: getCommonHandler(node)};
+                if (!node._eventHandlers[type]) {
+                    node._eventHandlers[type] = [];
+                    if (node.addEventListener) {
+                        node.addEventListener(type, node._eventHandlers._handler, false);
+                    } else if (node.attachEvent) {
+                        node.attachEvent("on" + type, node._eventHandlers._handler);
+                    } else {
+                        throw(new Error('Unknown type of the node: ' + node));
+                    }
                 }
-            }
 
-            node._eventHandlers[type].push({handler: handler});
+                node._eventHandlers[type].push({handler: handler, namespaces: namespaces});
+            }
         },
 
         /**
          * Removes the handler from the node
          * @param {HTMLElement} node
-         * @param {String} type
-         * @param {Function} handler
-         * @returns {boolean} - true if the handler was removed
+         * @param {String} description - description of the event: space separated event types and dot prefixed namespaces
+         * @param {Function} [handler]
          */
-        off: function(node, type, handler) {
-            type = getFixedType(type);
-            if (!node._eventHandlers || !node._eventHandlers[type]) return;
+        off: function(node, description, handler) {
+            if (!node._eventHandlers) return;
 
-            for (var i = 0; i < node._eventHandlers[type].length; i++) {
-                var desc = node._eventHandlers[type][i];
-                if (desc.handler === handler) {
-                    node._eventHandlers[type].splice(i, 1);
-                    if (node._eventHandlers[type].length === 0) {
-                        removeHandlerType(node, type);
+            var types = getEventTypes(description);
+            var namespaces = getEventNamespaces(description);
+
+            if (types.length === 0) {
+                types = Object.keys(node._eventHandlers);
+                types.splice(types.indexOf('_handler'), 1);
+            }
+
+            for (var j = 0; j < types.length; j++) {
+                var type = getFixedType(types[j]);
+                if (!node._eventHandlers[type]) continue;
+
+                for (var i = 0; i < node._eventHandlers[type].length; i++) {
+                    var desc = node._eventHandlers[type][i];
+                    if ((namespaces.length === 0 || arraysIntersect(namespaces, desc.namespaces)) && (!handler || desc.handler === handler)) {
+                        node._eventHandlers[type].splice(i, 1);
+                        if (node._eventHandlers[type].length === 0) {
+                            removeHandlerType(node, type);
+                            break;
+                        }
                     }
-
-                    return true;
                 }
             }
         },
@@ -54,6 +71,21 @@
             return {x: e.pageX - docPos.x, y: e.pageY - docPos.y};
         }
     };
+
+    function arraysIntersect(a,b) {
+        for (var i = 0; i < a.length; i++) {
+            if (b.indexOf(a[i]) !== -1) return true;
+        }
+        return false;
+    }
+
+    function getEventTypes(string) {
+        return string.replace(/\.[A-Za-z0-9_-]+/g, '').match(/[A-Za-z0-9_-]+/g) || [];
+    }
+
+    function getEventNamespaces(string) {
+        return string.match(/\.[A-Za-z0-9_-]+/g) || [];
+    }
 
     function getPosition(e) {
         var clientRect = e.getBoundingClientRect(),

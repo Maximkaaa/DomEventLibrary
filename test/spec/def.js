@@ -56,6 +56,16 @@ describe('DOM Event Fixer', function() {
             expect(called1).toBe(true);
             expect(called2).toBe(false);
         });
+
+        it('should set the listener to several events if specified', function() {
+            def.on(element, 'click mousemove', handler1);
+            dem(element, 'click');
+            expect(called1).toBe(true);
+
+            called1 = false;
+            dem(element, 'mousemove');
+            expect(called1).toBe(true);
+        });
     });
 
     describe('Removing event listeners', function() {
@@ -75,6 +85,43 @@ describe('DOM Event Fixer', function() {
 
             expect(called1).toBe(false);
             expect(called2).toBe(true);
+        });
+    });
+
+    describe('Event sequencing', function() {
+        it('returning false in handler should stop event sequencing', function() {
+            var called = false;
+            var handler = function() { called = true; return false; };
+            def.on(element, 'click', handler);
+            def.on(element, 'click', handler1);
+            dem(element, 'click');
+
+            expect(called).toBe(true);
+            expect(called1).toBe(false);
+        });
+    });
+
+    describe('Namespaces', function() {
+        it('should separate the event name from the namespaces', function() {
+            def.on(element, 'click.ns', handler1);
+            dem(element, 'click');
+            expect(called1).toBe(true);
+
+            called1 = false;
+            dem(element, '.ns');
+            expect(called1).toBe(false);
+        });
+
+        it('should remove all handlers of specified namespace', function() {
+            def.on(element, 'click.ns1', handler1);
+            def.on(element, 'mousemove.ns1', handler2);
+            def.on(element, 'click', handler3);
+            def.off(element, '.ns1');
+            dem(element, 'click');
+            dem(element, 'mousemove');
+            expect(called1).toBe(false);
+            expect(called2).toBe(false);
+            expect(called3).toBe(true);
         });
     });
 
