@@ -70,4 +70,47 @@ describe('DOM Event Mocker', function() {
         });
     });
 
+    describe('drag', function() {
+        it('should trigger mousedown, mousemove and mouseup events', function() {
+            def.on(element, 'mousedown', handler1);
+            def.on(element, 'mousemove', handler2);
+            def.on(element, 'mouseup', handler3);
+
+            dem.drag(element);
+            expect(called1).toBe(true);
+            expect(called2).toBe(true);
+            expect(called3).toBe(true);
+        });
+
+        it('should trigger mousedown event in the start position', function() {
+            var event;
+            var handler = function(e) { event = e; };
+            def.on(element, 'mousedown', handler);
+            dem.drag(element, [10, 20]);
+
+            expect(event.pageX).toBe(60);
+            expect(event.pageY).toBe(70);
+        });
+
+        it('should trigger mouseup event in the start position', function() {
+            var event;
+            var handler = function(e) { event = e; };
+            def.on(element, 'mouseup', handler);
+            dem.drag(element, [10, 20], [30, 50]);
+
+            expect(event.pageX).toBe(80);
+            expect(event.pageY).toBe(100);
+        });
+
+        it('should trigger mousemove event many times', function() {
+            var counter = 0;
+            var handler = function() { counter++; };
+            def.on(element, 'mousemove', handler);
+            dem.drag(element, [10, 20], [30, 50]);
+
+            expect(counter).toBe(20);
+        });
+
+    });
+
 });
