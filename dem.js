@@ -52,15 +52,13 @@
         dem.mousedown(node, startPosition[0], startPosition[1], parameters);
 
         var position = startPosition.concat();
-        for (var i = 0; i < MAX_STEPS; i++) {
+        var stepsX = Math.abs(Math.round((endPosition[0] - startPosition[0]) / step[0]));
+        var stepsY = Math.abs(Math.round((endPosition[1] - startPosition[1]) / step[1]));
+        var steps = Math.min(stepsX, stepsY, MAX_STEPS);
+
+        for (var i = 0; i < steps; i++) {
             position[0] += step[0];
             position[1] += step[1];
-
-            if (signX === 1 && position[0] > endPosition[0] || signX === -1 && position[0] < endPosition[0] ||
-                signY === 1 && position[1] > endPosition[1] || signY === -1 && position[1] < endPosition[1]) {
-                break;
-            }
-
             dem.mousemove(node, position[0], position[1], parameters);
         }
 
