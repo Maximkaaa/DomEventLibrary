@@ -1,5 +1,7 @@
 (function() {
 
+    'use strict';
+
     var dem = function(node, event, parameters) {
         parameters = parameters || {};
         var EventType = eventTypes[event] || Event;
