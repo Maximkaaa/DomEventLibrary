@@ -24,10 +24,19 @@
         dem.pureClick.apply(dem, arguments);
     };
 
+    dem.dblclick = function(node, x, y, parameters) {
+        dem.click.apply(dem, arguments);
+        dem.click.apply(dem, arguments);
+        dem.pureDblclick.apply(dem, arguments);
+    };
+
     dem.pureClick = getMouseEventMocker('click');
+    dem.pureDblclick = getMouseEventMocker('dblclick');
     dem.mousedown = getMouseEventMocker('mousedown');
     dem.mouseup = getMouseEventMocker('mouseup');
     dem.mousemove = getMouseEventMocker('mousemove');
+    dem.mouseout = getMouseEventMocker('mouseout');
+    dem.contextmenu = getMouseEventMocker('contextmenu');
 
     function getMouseEventMocker(type) {
         return function(node, x, y, parameters) {
@@ -115,6 +124,9 @@
         mousemove: MouseEvent,
         mousedown: MouseEvent,
         mouseup: MouseEvent,
+        dblclick: MouseEvent,
+        mouseout: MouseEvent,
+        contextmenu: MouseEvent,
         wheel: WheelEvent
     };
 

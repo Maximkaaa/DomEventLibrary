@@ -53,10 +53,12 @@
                 var type = getFixedType(types[j]);
                 if (!node._eventHandlers[type]) continue;
 
-                for (var i = 0; i < node._eventHandlers[type].length; i++) {
-                    var desc = node._eventHandlers[type][i];
+                var list = node._eventHandlers[type].concat();
+                for (var i = 0; i < list.length; i++) {
+                    var desc = list[i];
                     if ((namespaces.length === 0 || arraysIntersect(namespaces, desc.namespaces)) && (!handler || desc.handler === handler)) {
-                        node._eventHandlers[type].splice(i, 1);
+                        var index = node._eventHandlers[type].indexOf(desc);
+                        node._eventHandlers[type].splice(index, 1);
                         if (node._eventHandlers[type].length === 0) {
                             removeHandlerType(node, type);
                             break;
