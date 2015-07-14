@@ -18,7 +18,13 @@
      * @param {Number} [y] - y coordinate of the event relative to the left top corner of the node
      * @param {Object} [parameters] - additional parameters of the event
      */
-    dem.click = getMouseEventMocker('click');
+    dem.click = function(node, x, y, parameters) {
+        dem.mousedown.apply(dem, arguments);
+        dem.mouseup.apply(dem, arguments);
+        dem.pureClick.apply(dem, arguments);
+    };
+
+    dem.pureClick = getMouseEventMocker('click');
     dem.mousedown = getMouseEventMocker('mousedown');
     dem.mouseup = getMouseEventMocker('mouseup');
     dem.mousemove = getMouseEventMocker('mousemove');
@@ -65,21 +71,22 @@
         }
 
         dem.mouseup(node, endPosition[0], endPosition[1], parameters);
+        dem.pureClick(node, endPosition[0], endPosition[1], parameters);
     };
 
     /**
      * Trigger the mouse wheel event
      * @param {HTMLElement} node - the target of the event
-     * @param {Number} [count=3] - integer of how many times to call the events. Minus sign for scrolling backwards.
+     * @param {Number} [count=1] - integer of how many times to call the events. Minus sign for scrolling backwards.
      * @param {Number[]} [position=[0,0]] - position of the event relative to the top left corner of the target element
      * @param {Object} [parameters] - additional parameters of the event
      * @param {Number} [delay=300] - interval between scroll events in milliseconds
      */
     dem.wheel = function(node, count, position, parameters, delay) {
-        count = count || 3;
+        count = count || 1;
         position = position || [0, 0];
         parameters = parameters || {};
-        delay = delay || 300;
+        delay = delay || 50;
         var nodeOffset = def.getNodePosition(node);
 
         parameters.clientX = nodeOffset.x + position[0];
