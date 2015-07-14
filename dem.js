@@ -67,6 +67,38 @@
         dem.mouseup(node, endPosition[0], endPosition[1], parameters);
     };
 
+    /**
+     * Trigger the mouse wheel event
+     * @param {HTMLElement} node - the target of the event
+     * @param {Number} [count=3] - integer of how many times to call the events. Minus sign for scrolling backwards.
+     * @param {Number[]} [position=[0,0]] - position of the event relative to the top left corner of the target element
+     * @param {Object} [parameters] - additional parameters of the event
+     * @param {Number} [delay=300] - interval between scroll events in milliseconds
+     */
+    dem.wheel = function(node, count, position, parameters, delay) {
+        count = count || 3;
+        position = position || [0, 0];
+        parameters = parameters || {};
+        delay = delay || 300;
+        var nodeOffset = def.getNodePosition(node);
+
+        parameters.clientX = nodeOffset.x + position[0];
+        parameters.clientY = nodeOffset.y + position[1];
+
+        var delta = count > 0 ? 1 : -1;
+        parameters.deltaY = -delta * 100;
+
+        callWheelMocker(node, parameters, 0, delta, count, delay);
+    };
+
+    function callWheelMocker(node, parameters, counter, delta, count, delay) {
+        dem(node, 'wheel', parameters);
+        counter += delta;
+        if (Math.abs(counter) < Math.abs(count)) {
+            setTimeout(function() { callWheelMocker(node, parameters, counter, delta, count, delay); }, delay);
+        }
+    }
+
     function sign(x) {
         return typeof x === 'number' ? x ? x < 0 ? -1 : 1 : x === x ? 0 : NaN : NaN;
     }
@@ -75,7 +107,8 @@
         click: MouseEvent,
         mousemove: MouseEvent,
         mousedown: MouseEvent,
-        mouseup: MouseEvent
+        mouseup: MouseEvent,
+        wheel: WheelEvent
     };
 
     if (typeof define === 'function' && define.amd) {

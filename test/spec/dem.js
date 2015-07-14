@@ -110,7 +110,42 @@ describe('DOM Event Mocker', function() {
 
             expect(counter).toBe(20);
         });
+    });
 
+    describe('wheel', function() {
+        beforeEach(function() {
+            jasmine.clock().install();
+        });
+
+        afterEach(function() {
+            jasmine.clock().uninstall();
+        });
+
+        it('should trigger the wheel event', function() {
+            def.on(element, 'wheel', handler1);
+            dem.wheel(element);
+            expect(called1).toBe(true);
+        });
+
+        it('should trigger the wheel event the number of times specified as count parameter', function() {
+            var counter = 0;
+            def.on(element, 'wheel', function() { counter++; });
+            dem.wheel(element, 5);
+            jasmine.clock().tick(5000);
+            expect(counter).toBe(5);
+        });
+
+        it('should set the wheelDirection property of the event to the reversed sign of the count parameter', function() {
+            var e;
+            def.on(element, 'wheel', function(event) { e = event; });
+            dem.wheel(element, 2);
+            jasmine.clock().tick(5000);
+            expect(e.wheelDirection).toBe(1);
+
+            dem.wheel(element, -2);
+            jasmine.clock().tick(5000);
+            expect(e.wheelDirection).toBe(-1);
+        });
     });
 
 });
