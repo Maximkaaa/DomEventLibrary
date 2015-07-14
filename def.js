@@ -138,7 +138,7 @@
             event.which = (event.button & 1 ? 1 : ( event.button & 2 ? 3 : ( event.button & 4 ? 2 : 0 ) ));
         }
 
-        if (event.type === 'wheel') event.wheelDirction = getWheelDirection(event);
+        if (event.type === 'wheel') event.wheelDirection = getWheelDirection(event);
 
         event.isFixed = true;
 
